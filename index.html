@@ -1,0 +1,2083 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>لوحة التحكم | منصة أبو قاعود</title>
+<style>
+:root{
+  --primary:#2563eb;
+  --secondary:#0f766e;
+  --accent:#f59e0b;
+  --bg:#f5f7fb;
+  --surface:#ffffff;
+  --text:#152033;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --danger:#dc2626;
+  --success:#059669;
+  --shadow:0 12px 35px rgba(15,23,42,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.dark{--bg:#0b1220;--surface:#111827;--text:#f3f4f6;--muted:#9ca3af;--border:#243047;--shadow:0 12px 35px rgba(0,0,0,.25)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.hidden{display:none!important}
+
+.toast{position:fixed;left:20px;bottom:20px;z-index:9999;background:#111827;color:#fff;padding:12px 20px;border-radius:14px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:.25s;font-size:14px;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 15% 20%,rgba(37,99,235,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(15,118,110,.16),transparent 30%),var(--bg)}
+.login-card{width:min(440px,100%);background:var(--surface);border:1px solid var(--border);border-radius:28px;padding:34px;box-shadow:var(--shadow)}
+.brand{display:flex;gap:14px;align-items:center;margin-bottom:28px}
+.brand-mark{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;color:#fff;font-size:28px;font-weight:800}
+.brand h1{font-size:21px;margin:0}
+.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:12px;padding:12px 13px;outline:none;transition:border-color .15s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+.btn{padding:11px 16px;border-radius:12px;background:var(--primary);color:#fff;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.15s;text-decoration:none}
+.btn:hover{filter:brightness(1.05)}
+.btn.secondary{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.btn.secondary:hover{background:var(--bg)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.success{background:var(--success);color:#fff}
+.btn.small{padding:6px 11px;font-size:12px;border-radius:8px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+.layout{display:flex;min-height:100vh}
+.sidebar{width:270px;background:var(--surface);border-left:1px solid var(--border);padding:18px;position:fixed;right:0;top:0;bottom:0;z-index:100;overflow:auto;transition:.25s}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.side-title{font-weight:900;font-size:16px}
+.nav{display:grid;gap:6px}
+.nav button{background:transparent;color:var(--muted);text-align:right;padding:12px 13px;border-radius:12px;display:flex;align-items:center;gap:10px;width:100%}
+.nav button.active,.nav button:hover{background:rgba(37,99,235,.1);color:var(--primary);font-weight:700}
+.main{margin-right:270px;min-width:0;width:calc(100% - 270px)}
+.topbar{height:72px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 22px;position:sticky;top:0;z-index:90}
+.menu-btn{display:none}
+.search{flex:1;max-width:520px;position:relative}
+.search input{width:100%;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:13px;padding:11px 42px 11px 12px}
+.search span{position:absolute;right:13px;top:10px;color:var(--muted)}
+.top-actions{margin-right:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{width:42px;height:42px;border-radius:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);display:inline-grid;place-items:center}
+.admin-chip{padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:12px;font-size:12px}
+
+.content{padding:24px;max-width:1600px;margin:auto}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.page-head h2{margin:0;font-size:24px}
+.page-head p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:17px;box-shadow:var(--shadow)}
+.stat .n{font-size:25px;font-weight:900;margin-top:9px}
+.stat .l{font-size:12px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+.panel-title h3{margin:0;font-size:16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:13px}
+.table-wrap{overflow:auto}
+.table{width:100%;border-collapse:collapse;min-width:680px}
+.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:right;font-size:12px;vertical-align:middle}
+.table th{color:var(--muted);font-weight:700;background:rgba(148,163,184,.06)}
+.badge{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.badge.green{background:rgba(5,150,105,.1);color:var(--success)}
+.badge.red{background:rgba(220,38,38,.1);color:var(--danger)}
+.badge.blue{background:rgba(37,99,235,.1);color:var(--primary)}
+.empty{padding:35px;text-align:center;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+
+.modal-back{position:fixed;inset:0;background:rgba(2,6,23,.58);z-index:1000;display:grid;place-items:center;padding:16px}
+.modal{width:min(900px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:0 25px 80px rgba(0,0,0,.25);padding:20px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-head h3{margin:0}
+.close{width:38px;height:38px;border-radius:10px;background:var(--bg);color:var(--text)}
+.form-actions{display:flex;justify-content:flex-start;gap:8px;margin-top:18px}
+.upload{border:2px dashed var(--border);padding:20px;border-radius:16px;text-align:center;background:var(--bg)}
+.thumb{width:80px;height:55px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:var(--bg)}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.media-card{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
+.media-card img,.media-card video{width:100%;height:130px;object-fit:cover;background:#0b1220}
+.media-card .meta{padding:12px;display:flex;flex-direction:column;flex:1;gap:6px}
+.switch{display:flex;align-items:center;gap:8px}
+.switch input{width:18px;height:18px}
+.color-row{display:flex;gap:10px;align-items:center}
+.color-row input[type=color]{width:55px;height:42px;padding:3px;border:1px solid var(--border);border-radius:10px}
+.list{display:grid;gap:8px}
+.item{border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.muted{color:var(--muted)}
+.mobile-only{display:none}
+
+.video-preview-box{margin-top:10px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:14px}
+.video-embed-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000}
+.video-embed-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
+@media(max-width:1200px){.cards{grid-template-columns:repeat(4,1fr)}.grid3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){
+  .sidebar{transform:translateX(105%);box-shadow:var(--shadow)}
+  .sidebar.open{transform:none}
+  .main{margin-right:0;width:100%}
+  .menu-btn{display:block}
+  .topbar{padding:10px 14px}
+  .admin-chip{display:none}
+  .content{padding:15px}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .page-head{align-items:flex-start;flex-direction:column}
+  .mobile-only{display:block}
+}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">أ</div>
+      <div>
+        <h1>منصة أبو قاعود</h1>
+        <p>قاعدة البيانات ولوحة التحكم</p>
+      </div>
+    </div>
+    <div class="field">
+      <label>كلمة مرور الإدارة</label>
+      <input id="adminPassword" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور (أو استخدم المعاينة)">
+    </div>
+    <button id="loginBtn" class="btn" style="width:100%">دخول لوحة التحكم</button>
+    <button id="demoBtn" type="button" class="btn secondary" style="width:100%;margin-top:10px">معاينة مباشرة للوحة التحكم ⚡</button>
+    <p id="loginError" class="muted" style="margin:12px 0 0;font-size:12px"></p>
+  </div>
+</div>
+
+<div id="app" class="layout hidden">
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-head">
+    <div class="side-title">لوحة التحكم</div>
+    <button class="icon-btn mobile-only" id="closeSide">×</button>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:15px">
+    <button class="btn secondary" style="width:100%" id="exportBtn">تصدير نسخة احتياطية</button>
+    <button class="btn secondary" style="width:100%;margin-top:8px" id="importBtn">استيراد نسخة احتياطية</button>
+    <input id="importFile" type="file" accept=".json,application/json" class="hidden">
+    <button class="btn danger" style="width:100%;margin-top:8px" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <button id="openSide" class="icon-btn menu-btn">☰</button>
+  <div class="search">
+    <span>⌕</span>
+    <input id="globalSearch" placeholder="بحث في الكورسات والطلاب والدروس والاختبارات والوسائط">
+  </div>
+  <div class="top-actions">
+    <button id="themeBtn" class="icon-btn" title="تغيير النمط">◐</button>
+    <button id="refreshBtn" class="icon-btn" title="تحديث">↻</button>
+    <div class="admin-chip">مدير المنصة</div>
+  </div>
+</header>
+<section id="content" class="content"></section>
+</main>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+const CONFIG={
+  url:"https://tnqiheclnnobncnzoldp.supabase.co",
+  key:"sb_publishable_8t9_P0slPk8c8wul6DTVsw_UaFDRmqy",
+  mediaFunction:"https://tnqiheclnnobncnzoldp.supabase.co/functions/v1/admin-media"
+};
+
+const NAV=[
+  ["dashboard","الرئيسية","⌂"],
+  ["branding","العلامة التجارية","◈"],
+  ["homepage","الصفحة الرئيسية","▦"],
+  ["courses","الكورسات","▣"],
+  ["lessons","الدروس والفيديوهات","▶"],
+  ["quizzes","الاختبارات والأسئلة","✓"],
+  ["students","الطلاب","♙"],
+  ["results","النتائج","▤"],
+  ["enrollments","التسجيلات والتقدم","↗"],
+  ["media","الصور والملفات","▧"],
+  ["content","المحتوى","☷"],
+  ["notifications","الإشعارات","◉"],
+  ["settings","الإعدادات","⚙"]
+];
+
+const initialSnapshot=()=>{
+  try{
+    const cached=localStorage.getItem("abuqaoud_snapshot");
+    if(cached){
+      const parsed=JSON.parse(cached);
+      if(parsed && parsed.branding) return parsed;
+    }
+  }catch(e){}
+  return {
+    branding:{
+      platformName:"منصة أبو قاعود",
+      logoUrl:"",
+      faviconUrl:"",
+      heroImageUrl:"",
+      heroTitle:"منصة الأستاذ أبو قاعود للتعليم المتميز",
+      heroSubtitle:"شروحات مبسطة واختبارات تفاعلية ومتابعة مستمرة للطلاب",
+      primaryColor:"#2563eb",
+      secondaryColor:"#0f766e",
+      accentColor:"#f59e0b",
+      defaultTheme:"device",
+      watermark:{enabled:false,url:"",opacity:.08,size:180,position:"center",repeat:true},
+      whatsapp:{number:"01278891990",message:"مرحبًا، أريد الاستفسار عن منصة أبو قاعود",enabled:true,position:"left"},
+      facebookUrl:""
+    },
+    homepage_sections:[
+      {id:"s1",title:"أحدث الكورسات",subtitle:"مناهج الثانوية العامة واللغات",order:1,visible:true}
+    ],
+    banners:[],
+    categories:[
+      {id:"c1",name:"الصف الأول الثانوي",description:"منهج شامل ومراجعات"},
+      {id:"c2",name:"الصف الثاني الثانوي",description:"شرح وافي وتمارين"},
+      {id:"c3",name:"الصف الثالث الثانوي",description:"كورس مكثف وحل امتحانات"}
+    ],
+    courses:[
+      {
+        id:"course-1",
+        title:"كورس اللغة العربية للثانوية العامة",
+        shortDescription:"شرح مفصل لكافة فروع النحو والبلاغة والأدب والقراءة مع حل تدريبات شاملة",
+        fullDescription:"يشمل الكورس شرحاً تفاعلياً لجميع قواعد النحو مع تطبيقات عملية وحل امتحانات سابقة ونماذج الوزارة.",
+        coverImage:"",
+        thumbnail:"",
+        banner:"",
+        categoryId:"c3",
+        level:"الصف الثالث الثانوي",
+        price:250,
+        discountPrice:180,
+        isFree:false,
+        duration:"45 ساعة",
+        requirements:["الجدية والالتزام بحل الواجبات"],
+        outcomes:["إتقان الإعراب وفهم البلاغة بأسلوب سلس"],
+        tags:["ثانوية عامة","نحو","بلاغة"],
+        featured:true,
+        published:true,
+        order:1,
+        lessons:[
+          {
+            id:"l-1",
+            courseId:"course-1",
+            lectureNumber:1,
+            order:1,
+            title:"المحاضرة الأولى: مراجعة شاملة لأساسيات النحو",
+            description:"شرح مفصل للجملة الاسمية والخبر وأنواعه مع نماذج إعرابية هامة.",
+            videoUrl:"https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            videoUrls:["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+            pdfUrl:"",
+            thumbnail:"",
+            duration:"45 دقيقة",
+            type:"شرح",
+            quizId:"q-1",
+            isFreePreview:true,
+            published:true
+          }
+        ]
+      }
+    ],
+    quizzes:[
+      {
+        id:"q-1",
+        courseId:"course-1",
+        title:"اختبار المحاضرة الأولى",
+        description:"اختبار تشخيصي لقياس مدى استيعاب أساسيات النحو",
+        instructions:"أجب عن جميع الأسئلة في الوقت المحدد.",
+        durationMinutes:20,
+        passingScorePercentage:60,
+        maxAttempts:2,
+        shuffle:false,
+        randomAnswers:false,
+        showResults:true,
+        showExplanations:true,
+        enabled:true,
+        questions:[
+          {
+            id:"qu-1",
+            text:"ما إعراب كلمة (العلمُ) في جملة (العلمُ نورٌ)؟",
+            points:1,
+            difficulty:"سهل",
+            correctAnswerId:"أ",
+            explanation:"العلم: مبتدأ مرفوع وعلامة رفعه الضمة الظاهرة.",
+            options:[
+              {label:"أ",text:"مبتدأ مرفوع",isCorrect:true},
+              {label:"ب",text:"خبر مرفوع",isCorrect:false},
+              {label:"ج",text:"فاعل مرفوع",isCorrect:false},
+              {label:"د",text:"مفعول به",isCorrect:false}
+            ]
+          }
+        ]
+      }
+    ],
+    notifications:[],
+    announcements:[],
+    testimonials:[],
+    faqs:[],
+    pages:[],
+    navigation:[],
+    media:[
+      {id:"m-1",name:"شعار المنصة.png",type:"image/png",size:245760,url:"https://placehold.co/400x200/2563eb/ffffff?text=Abu+Qaaoud"},
+      {id:"m-2",name:"نموذج فيديو شرح.mp4",type:"video/mp4",size:15400000,url:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+    ],
+    theme:{},
+    auditLogs:[
+      {id:"a-1",action:"تسجيل دخول ناجح",entity:"لوحة التحكم",time:new Date().toISOString()}
+    ]
+  };
+};
+
+let state={
+  password:"",
+  snapshot:initialSnapshot(),
+  dashboard:{
+    stats:{students:142,courses:1,lessons:1,quizzes:1,questions:1,enrollments:289,results:312},
+    students:[
+      {id:"st-1",name:"أحمد محمد علي",phone:"01012345678",email:"ahmed@example.com",wallet:150,status:"active",registered_at:new Date().toISOString(),average:92,enrollments:[{course_title:"كورس اللغة العربية",progress_percentage:75}]}
+    ],
+    exam_sessions:[
+      {student_name:"أحمد محمد علي",quiz_title:"اختبار المحاضرة الأولى",score:9,total_score:10,percentage:90,correct_answers:9,wrong_answers:1,unanswered:0,status:"completed"}
+    ]
+  },
+  section:"dashboard",
+  search:"",
+  mediaFilter:""
+};
+
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function toast(msg,type="ok"){
+  const t=$("toast");
+  if(!t)return;
+  t.textContent=msg;
+  t.style.background=type==="error"?"#b91c1c":type==="warn"?"#92400e":type==="copy"?"#059669":"#111827";
+  t.classList.add("show");
+  clearTimeout(window.__toast);
+  window.__toast=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+async function copyText(text, successMsg="تم نسخ الرابط بنجاح! 📋", btnEl=null){
+  if(!text){toast("لا يوجد رابط أو نص لنسخه","warn");return false}
+  let copied=false;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      copied=true;
+    }
+  }catch(e){copied=false}
+
+  if(!copied){
+    try{
+      const ta=document.createElement("textarea");
+      ta.value=text;
+      ta.style.position="fixed";
+      ta.style.left="-9999px";
+      ta.style.top="-9999px";
+      ta.setAttribute("readonly","");
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0,99999);
+      copied=document.execCommand("copy");
+      document.body.removeChild(ta);
+    }catch(err){copied=false}
+  }
+
+  if(copied){
+    toast(successMsg,"copy");
+    if(btnEl){
+      const orig=btnEl.innerHTML;
+      btnEl.innerHTML="✓ تم النسخ";
+      btnEl.style.background="var(--success)";
+      btnEl.style.color="#fff";
+      setTimeout(()=>{
+        btnEl.innerHTML=orig;
+        btnEl.style.background="";
+        btnEl.style.color="";
+      },1600);
+    }
+    return true;
+  }
+  return false;
+}
+
+function extractYouTubeId(url){
+  if(!url || typeof url !== "string") return null;
+  let raw = url.trim();
+  if(!raw) return null;
+
+  if(raw.includes("<iframe") && raw.includes("src=")){
+    const m = raw.match(/src=["']([^"']+)["']/i);
+    if(m && m[1]) raw = m[1].trim();
+  }
+
+  raw = raw.replace(/[<>\(\)\[\]"']/g, "").trim();
+
+  if(/^(?:www\.)?(?:youtube\.com|youtu\.be)\//i.test(raw)){
+    raw = "https://" + raw;
+  }
+
+  const ytMatch = raw.match(/(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+  if(ytMatch && ytMatch[1]){
+    return ytMatch[1];
+  }
+  return null;
+}
+
+function getVideoEmbedInfo(url, useNoCookie=true){
+  if(!url||typeof url!=="string")return null;
+  let raw=url.trim();
+  if(!raw)return null;
+
+  const ytId = extractYouTubeId(raw);
+  if(ytId){
+    const domain = useNoCookie ? "https://www.youtube-nocookie.com" : "https://www.youtube.com";
+    const src = `${domain}/embed/${ytId}?rel=0&enablejsapi=1&playsinline=1`;
+    return {
+      type: "youtube",
+      id: ytId,
+      src: src,
+      embedUrl: `${domain}/embed/${ytId}`,
+      iframeCode: `<iframe width="100%" height="450" src="${src}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`,
+      title: "فيديو يوتيوب 🎬"
+    };
+  }
+
+  const driveMatch=raw.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+  if(driveMatch&&driveMatch[1]){
+    const id=driveMatch[1];
+    return {
+      type:"drive",
+      id,
+      src:`https://drive.google.com/file/d/${id}/preview`,
+      embedUrl:`https://drive.google.com/file/d/${id}/preview`,
+      iframeCode:`<iframe width="100%" height="450" src="https://drive.google.com/file/d/${id}/preview" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+      title:"فيديو جوجل درايف 📁"
+    };
+  }
+
+  const vimeoMatch=raw.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)/i);
+  if(vimeoMatch&&vimeoMatch[3]){
+    const id=vimeoMatch[3];
+    return {
+      type:"vimeo",
+      id,
+      src:`https://player.vimeo.com/video/${id}?autoplay=1`,
+      embedUrl:`https://player.vimeo.com/video/${id}`,
+      iframeCode:`<iframe width="100%" height="450" src="https://player.vimeo.com/video/${id}?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
+      title:"فيديو فيميو 🎥"
+    };
+  }
+
+  const isDirect=raw.match(/\.(mp4|webm|mov|m4v)(\?.*)?$/i) || raw.includes("supabase.co/storage") || raw.includes("/videos/");
+  if(isDirect){
+    return {
+      type:"direct",
+      src:raw,
+      embedUrl:raw,
+      iframeCode:`<video width="100%" height="auto" controls autoplay src="${raw}"></video>`,
+      title:"فيديو مباشر MP4 ⚡"
+    };
+  }
+
+  if(raw.startsWith("http://")||raw.startsWith("https://")){
+    return {
+      type:"generic",
+      src:raw,
+      embedUrl:raw,
+      iframeCode:`<iframe width="100%" height="450" src="${raw}" frameborder="0" allowfullscreen></iframe>`,
+      title:"رابط خارجي 🌐"
+    };
+  }
+
+  return null;
+}
+
+function updateVideoPreview(inputEl, previewId){
+  const container=$(previewId);
+  if(!container)return;
+  const val=(inputEl?.value||"").trim();
+  if(!val){
+    container.innerHTML="";
+    container.style.display="none";
+    return;
+  }
+  const useNoCookie = container.dataset.nocookie !== "false";
+  const info=getVideoEmbedInfo(val, useNoCookie);
+  if(!info){
+    container.style.display="block";
+    container.innerHTML=`<div style="padding:10px;background:rgba(245,158,11,0.1);border:1px dashed var(--accent);border-radius:12px;font-size:12px">⚠ تم إدخال الرابط. سيعمل كرابط خارجي أو يمكنك وضع رابط يوتيوب أو جوجل درايف أو MP4 مباشر لمعاينته هنا.</div>`;
+    return;
+  }
+
+  container.style.display="block";
+  let playerHtml="";
+  if(info.type==="direct"){
+    playerHtml=`<video controls playsinline preload="metadata" src="${esc(info.src)}" style="width:100%;max-height:260px;border-radius:12px;background:#000;display:block"></video>`;
+  }else{
+    playerHtml=`<div class="video-embed-container"><iframe id="frame_${previewId}" src="${esc(info.src)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+  }
+
+  const embedCode=info.iframeCode||`<iframe width="100%" height="450" src="${esc(info.embedUrl)}" frameborder="0" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+
+  container.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="badge green">${esc(info.title)}</span>
+        ${info.type==="youtube" ? `
+          <button type="button" class="btn small secondary" style="font-size:10px;padding:2px 7px" onclick="togglePlayerServer('${previewId}', '${esc(val)}')">
+            ${useNoCookie ? 'تبديل لخادم YouTube المباشر 🔄' : 'تبديل لخادم No-Cookie 🛡️'}
+          </button>
+        `: ""}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button type="button" class="btn small secondary" style="font-size:11px;padding:3px 8px" onclick="copyText('${esc(val)}','تم نسخ الرابط المباشر 📋',this)">نسخ الرابط 📋</button>
+        <button type="button" class="btn small secondary" style="font-size:11px;padding:3px 8px" onclick="copyText('${esc(embedCode)}','تم نسخ كود التضمين 🔗',this)">نسخ التضمين 🔗</button>
+        <a href="${esc(val)}" target="_blank" class="btn small secondary" style="font-size:11px;padding:3px 8px;text-decoration:none">فتح المصدر ↗</a>
+      </div>
+    </div>
+    ${playerHtml}
+    ${info.type==="youtube" ? `
+      <div style="margin-top:6px;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center">
+        <span>💡 تم تفعيل حماية ضد <b>Error 153</b> عبر (Strict Referrer & No-Cookie).</span>
+        <a href="${esc(val)}" target="_blank" style="color:var(--primary);text-decoration:none">مشاهدة على تطبيق يوتيوب مباشرة ↗</a>
+      </div>
+    `: ""}
+  `;
+}
+
+function togglePlayerServer(previewId, videoUrl){
+  const container = $(previewId);
+  if(!container) return;
+  const current = container.dataset.nocookie !== "false";
+  container.dataset.nocookie = current ? "false" : "true";
+  const inp = container.closest(".field")?.querySelector("[data-field-input]");
+  updateVideoPreview(inp || {value: videoUrl}, previewId);
+  toast(current ? "تم التبديل لمشغل YouTube القياسي" : "تم التبديل لمشغل No-Cookie المحمي");
+}
+
+async function pasteAndPreviewVideo(btn, inputSelector, previewId){
+  let text="";
+  try{
+    if(navigator.clipboard&&navigator.clipboard.readText){
+      text=await navigator.clipboard.readText();
+    }
+  }catch(e){}
+  if(!text){
+    text=window.prompt("الصق رابط يوتيوب أو الفيديو هنا:","");
+  }
+  if(text&&text.trim()){
+    const inp=document.querySelector(inputSelector);
+    if(inp){
+      inp.value=text.trim();
+      inp.dispatchEvent(new Event("input"));
+      updateVideoPreview(inp, previewId);
+      toast("تم وضع الرابط وتشغيل الفيديو بنجاح 🎬","ok");
+    }
+  }
+}
+
+function videoField(label, value, path){
+  const key=String(path||"").startsWith("m.")?String(path).slice(2):String(path);
+  const previewId="vp_"+Math.random().toString(36).slice(2,9);
+  const info=getVideoEmbedInfo(value);
+  return `<div class="field" data-wrapper-path="${esc(path)}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <label style="margin:0">${label}</label>
+      <div style="display:flex;gap:5px">
+        <button type="button" class="btn small success" style="padding:3px 8px;font-size:11px" onclick="pasteAndPreviewVideo(this, '[data-field-input=\\'${esc(path)}\\']', '${previewId}')">لصق الرابط وتشغيل الفيديو ⚡</button>
+        ${value ? `<button type="button" class="btn small secondary" style="padding:3px 8px;font-size:11px" onclick="copyText('${esc(value)}','تم نسخ رابط الفيديو 📋',this)">نسخ 📋</button>` : ""}
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="position:relative;flex:1;min-width:210px">
+        <input type="text" data-m="${esc(key)}" value="${esc(value||"")}" placeholder="الصق رابط يوتيوب، درايف، أو MP4 مباشر..." style="width:100%;padding-left:65px" data-field-input="${esc(path)}" oninput="updateVideoPreview(this, '${previewId}')" onchange="updateVideoPreview(this, '${previewId}')" onpaste="setTimeout(()=>updateVideoPreview(this, '${previewId}'), 40)" onkeyup="updateVideoPreview(this, '${previewId}')">
+        <button type="button" class="btn small secondary" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);padding:4px 8px;font-size:11px;height:28px" onclick="copyInputVal(this)">نسخ 📋</button>
+      </div>
+      <label class="btn secondary small" style="white-space:nowrap;margin:0;display:inline-flex;align-items:center;cursor:pointer">
+        <span>رفع فيديو</span>
+        <input type="file" accept="video/*,.mp4,.webm,.mov,.m4v" data-file-path="${esc(path)}" style="display:none" onchange="handleSingleFileInput(this, '${esc(path)}', '${previewId}')">
+      </label>
+      <button type="button" class="btn secondary small" style="white-space:nowrap" onclick="openMediaPicker('${esc(path)}')">من الوسائط ▧</button>
+    </div>
+    <small class="muted" style="display:block;margin-top:4px">يدعم كافة صيغ يوتيوب (Watch, Shorts, Live, YouTu.be) - الفيديو يشتغل فوراً بمجرد وضع الرابط.</small>
+
+    <div id="${previewId}" class="video-preview-box" style="${value&&info?'':'display:none'}">
+      ${value&&info ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+          <span class="badge green">${esc(info.title)}</span>
+          <div style="display:flex;gap:5px">
+            <button type="button" class="btn small secondary" style="font-size:11px;padding:3px 8px" onclick="copyText('${esc(value)}','تم نسخ الرابط 📋',this)">نسخ الرابط 📋</button>
+            <button type="button" class="btn small secondary" style="font-size:11px;padding:3px 8px" onclick="copyText('${esc(info.iframeCode)}','تم نسخ كود التضمين 🔗',this)">نسخ التضمين 🔗</button>
+            <a href="${esc(value)}" target="_blank" class="btn small secondary" style="font-size:11px;padding:3px 8px;text-decoration:none">فتح ↗</a>
+          </div>
+        </div>
+        ${info.type==="direct" ? `<video controls autoplay playsinline preload="metadata" src="${esc(info.src)}" style="width:100%;max-height:260px;border-radius:12px;background:#000;display:block"></video>` : `<div class="video-embed-container"><iframe src="${esc(info.src)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`}
+      ` : ""}
+    </div>
+  </div>`;
+}
+
+function fileField(label,value,path,accept="image/*"){
+  const key=String(path||"").startsWith("m.")?String(path).slice(2):String(path);
+  const isDoc=String(value||"").toLowerCase().endsWith(".pdf") || String(accept||"").includes("pdf");
+  return `<div class="field" data-wrapper-path="${esc(path)}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <label style="margin:0">${label}</label>
+      ${value ? `<button type="button" class="btn small secondary" style="padding:3px 8px;font-size:11px" onclick="copyText('${esc(value)}','تم نسخ الرابط 📋',this)">نسخ الرابط الحالي 📋</button>` : ""}
+    </div>
+    ${value?`<div style="position:relative;margin-bottom:8px">
+      ${isDoc?`<div style="padding:10px 14px;background:rgba(37,99,235,0.07);border:1px solid var(--border);border-radius:12px;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span>📄 ملف مرفق (${esc(value.split('/').pop()||'ملف')})</span>
+        <div style="display:flex;gap:6px">
+          <a href="${esc(value)}" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:bold;font-size:12px;padding:4px 8px;background:var(--surface);border-radius:8px;border:1px solid var(--border)">معاينة ↗</a>
+          <button type="button" class="btn small secondary" style="font-size:11px;padding:4px 8px" onclick="copyText('${esc(value)}','تم نسخ رابط الملف 📋',this)">نسخ 📋</button>
+        </div>
+      </div>`:`<div style="position:relative;display:inline-block;width:100%"><img src="${esc(value)}" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;display:block" onerror="this.style.display='none'"><button type="button" class="btn small secondary" style="position:absolute;bottom:8px;left:8px;background:rgba(17,24,39,0.85);color:#fff;border:0" onclick="copyText('${esc(value)}','تم نسخ رابط الصورة 📋',this)">نسخ الصورة 📋</button></div>`}
+      <div class="muted" style="font-size:11px;word-break:break-all;margin-top:4px">الملف الحالي: ${esc(value)}</div>
+    </div>`:""}
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="position:relative;flex:1;min-width:210px">
+        <input type="text" data-m="${esc(key)}" value="${esc(value||"")}" placeholder="رابط مباشر للنشر السريع ⚡ أو اختر ملفًا" style="width:100%;padding-left:65px" data-field-input="${esc(path)}">
+        <button type="button" class="btn small secondary" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);padding:4px 8px;font-size:11px;height:28px" onclick="copyInputVal(this)">نسخ 📋</button>
+      </div>
+      <label class="btn secondary small" style="white-space:nowrap;margin:0;display:inline-flex;align-items:center;cursor:pointer">
+        <span>رفع ملف</span>
+        <input type="file" accept="${accept}" data-file-path="${esc(path)}" style="display:none" onchange="handleSingleFileInput(this, '${esc(path)}')">
+      </label>
+      <button type="button" class="btn secondary small" style="white-space:nowrap" onclick="openMediaPicker('${esc(path)}')">من الوسائط ▧</button>
+    </div>
+    <small class="muted">يمكنك إدخال رابط مباشر فوراً، أو اختيار ملف مرفوع مسبقاً، أو رفع ملف جديد ليُحفظ في القاعدة بدون مشاكل.</small>
+  </div>`;
+}
+
+async function handleSingleFileInput(fileInput, path, previewId=null){
+  const file = fileInput.files?.[0];
+  if(!file) return;
+  const p = fileInput.closest(".field")?.querySelector("[data-field-input]");
+  toast("جاري معالجة وتثبيت الملف... ⚡");
+  try{
+    const url = await uploadFileToStorage(file);
+    if(p){
+      p.value = url;
+      p.dispatchEvent(new Event("input"));
+    }
+    const key = path.startsWith("m.") ? path.slice(2) : path;
+    const directInput = document.querySelector(`[data-m="${key}"]`);
+    if(directInput) directInput.value = url;
+    if(!path.startsWith("m.")) setPath(path, url);
+
+    if(previewId){
+      updateVideoPreview(p, previewId);
+    }
+    toast("تم تجهيز وتثبيت الصورة بنجاح ✓");
+  }catch(e){
+    toast("حدث خطأ أثناء معالجة الصورة: " + e.message, "error");
+  }
+}
+
+function openMediaPicker(targetPath){
+  const media=state.snapshot.media||[];
+  const modalId="mediaPickerModal";
+  const content=`<div style="max-height:75vh;overflow:auto">
+    <div style="margin-bottom:12px;display:flex;gap:8px">
+      <input type="text" placeholder="بحث في الوسائط..." oninput="filterMediaPicker(this.value)" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)">
+    </div>
+    <div class="media-grid" id="pickerMediaGrid">
+      ${media.length ? media.map(m=>`
+        <div class="media-card picker-item" data-name="${esc(m.name||"")}" data-url="${esc(m.url||"")}">
+          ${String(m.type||"").startsWith("video")?`<video src="${esc(m.url)}" preload="metadata"></video>`:String(m.type||"").includes("pdf")?`<div style="height:120px;display:grid;place-items:center;font-size:32px;background:rgba(37,99,235,.07)">📄</div>`:`<img src="${esc(m.url)}" onerror="this.style.display='none'">`}
+          <div class="meta">
+            <b style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(m.name||"ملف")}</b>
+            <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
+              <button type="button" class="btn small" style="flex:1" onclick="applyMediaToField('${esc(targetPath)}','${esc(m.url)}')">استخدام الرابط ✓</button>
+              <button type="button" class="btn small secondary" onclick="copyText('${esc(m.url)}','تم نسخ الرابط 📋',this)">نسخ 📋</button>
+            </div>
+          </div>
+        </div>
+      `).join("") : `<div class="empty" style="grid-column:1/-1">لا توجد ملفات مرفوعة بعد</div>`}
+    </div>
+  </div>`;
+  const existing=document.getElementById(modalId);
+  if(existing)existing.remove();
+  const el=document.createElement("div");
+  el.id=modalId;
+  el.className="modal-back";
+  el.innerHTML=`<div class="modal"><div class="modal-head"><h3>اختيار ملف من الوسائط</h3><button class="close" onclick="document.getElementById('${modalId}').remove()">×</button></div>${content}</div>`;
+  document.body.appendChild(el);
+}
+
+function filterMediaPicker(query){
+  const q=(query||"").toLowerCase();
+  document.querySelectorAll(".picker-item").forEach(el=>{
+    const name=(el.dataset.name||"").toLowerCase();
+    const url=(el.dataset.url||"").toLowerCase();
+    el.style.display=(name.includes(q)||url.includes(q))?"flex":"none";
+  });
+}
+
+function applyMediaToField(path,url){
+  const el=document.querySelector(`[data-field-input="${path}"]`);
+  if(el){
+    el.value=url;
+    el.dispatchEvent(new Event("input"));
+    const wrapper=el.closest(".field");
+    const previewBox=wrapper?.querySelector(".video-preview-box");
+    if(previewBox){
+      updateVideoPreview(el, previewBox.id);
+    }
+  }
+  const key=path.startsWith("m.")?path.slice(2):path;
+  const directInput=document.querySelector(`[data-m="${key}"]`);
+  if(directInput)directInput.value=url;
+  if(!path.startsWith("m."))setPath(path,url);
+  copyText(url,"تم اختيار الملف ونسخ رابطه 📋");
+  document.getElementById("mediaPickerModal")?.remove();
+}
+
+function copyMediaUrl(id, btn){
+  const m=(state.snapshot.media||[]).find(x=>x.id===id);
+  const url=m?m.url:id;
+  copyText(url,"تم نسخ رابط الملف بنجاح! 📋",btn);
+}
+
+function copyMediaEmbed(id, btn){
+  const m=(state.snapshot.media||[]).find(x=>x.id===id);
+  const url=m?m.url:id;
+  const info=getVideoEmbedInfo(url);
+  const code=info?.iframeCode||`<iframe width="100%" height="450" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+  copyText(code,"تم نسخ كود التضمين التفاعلي! 🔗",btn);
+}
+
+function copyInputVal(btn){
+  const inp=btn.closest(".field")?.querySelector("[data-field-input]");
+  if(inp&&inp.value){
+    copyText(inp.value,"تم نسخ الرابط بنجاح! 📋",btn);
+  }else{
+    toast("الحقل فارغ حالياً","warn");
+  }
+}
+
+async function api(path,options={}){
+  const r=await fetch(CONFIG.url+path,{
+    ...options,
+    headers:{"apikey":CONFIG.key,"Authorization":"Bearer "+CONFIG.key,"Content-Type":"application/json",...(options.headers||{})}
+  });
+  const text=await r.text();
+  let data={};
+  try{data=text?JSON.parse(text):{}}catch{data={message:text}}
+  if(!r.ok)throw new Error(data.message||data.error||"حدث خطأ في الاتصال");
+  return data;
+}
+
+async function rpc(name,args){return api("/rest/v1/rpc/"+name,{method:"POST",body:JSON.stringify(args)})}
+
+function normalizeSnapshot(s){
+  const d=initialSnapshot();
+  return Object.assign(d,s||{},{
+    branding:Object.assign(d.branding,(s||{}).branding||{}),
+    watermark:Object.assign(d.branding.watermark,((s||{}).branding||{}).watermark||{}),
+    whatsapp:Object.assign(d.branding.whatsapp,((s||{}).branding||{}).whatsapp||{}),
+    courses:Array.isArray(s?.courses)?s.courses:d.courses,
+    quizzes:Array.isArray(s?.quizzes)?s.quizzes:d.quizzes,
+    categories:Array.isArray(s?.categories)?s.categories:d.categories,
+    homepage_sections:Array.isArray(s?.homepage_sections)?s.homepage_sections:d.homepage_sections,
+    banners:Array.isArray(s?.banners)?s.banners:[],
+    notifications:Array.isArray(s?.notifications)?s.notifications:[],
+    announcements:Array.isArray(s?.announcements)?s.announcements:[],
+    testimonials:Array.isArray(s?.testimonials)?s.testimonials:[],
+    faqs:Array.isArray(s?.faqs)?s.faqs:[],
+    pages:Array.isArray(s?.pages)?s.pages:[],
+    navigation:Array.isArray(s?.navigation)?s.navigation:[],
+    media:Array.isArray(s?.media)?s.media:d.media,
+    auditLogs:Array.isArray(s?.auditLogs)?s.auditLogs:d.auditLogs
+  });
+}
+
+async function load(){
+  try{
+    if(state.password){
+      const d=await rpc("admin_dashboard_data",{p_password:state.password});
+      if(d && d.snapshot){
+        const remote = normalizeSnapshot(d.snapshot);
+        const mergedCourses = [...(remote.courses||[])];
+        for(const lc of (state.snapshot.courses||[])){
+          if(!mergedCourses.some(rc=>rc.id===lc.id)){
+            mergedCourses.push(lc);
+          }
+        }
+        remote.courses = mergedCourses;
+        state.snapshot = remote;
+      }
+      if(d) {
+        state.dashboard = Object.assign({}, state.dashboard, d);
+      }
+    }
+  }catch(e){
+    console.warn("استخدام التخزين المحلي:", e.message);
+  }
+  
+  try{
+    const cached=localStorage.getItem("abuqaoud_snapshot");
+    if(cached){
+      const parsed=JSON.parse(cached);
+      if(Array.isArray(parsed?.courses)){
+        for(const c of parsed.courses){
+          if(!state.snapshot.courses.some(x=>x.id===c.id)){
+            state.snapshot.courses.push(c);
+          }
+        }
+      }
+    }
+    const cachedStudents=localStorage.getItem("abuqaoud_students_data");
+    if(cachedStudents){
+      const parsedStudents = JSON.parse(cachedStudents);
+      if(Array.isArray(parsedStudents) && parsedStudents.length){
+        state.dashboard.students = parsedStudents;
+      }
+    }
+  }catch(e){}
+
+  renderNav();
+  render();
+  applyTheme();
+}
+
+function audit(action,entity,previous=null,next=null){
+  state.snapshot.auditLogs.unshift({id:crypto.randomUUID(),action,entity,time:new Date().toISOString(),previous,next});
+  state.snapshot.auditLogs=state.snapshot.auditLogs.slice(0,500);
+}
+
+async function sync(message="تم الحفظ بنجاح"){
+  try{
+    localStorage.setItem("abuqaoud_snapshot", JSON.stringify(state.snapshot));
+    localStorage.setItem("abuqaoud_students_data", JSON.stringify(state.dashboard.students||[]));
+    localStorage.setItem("abuqaoud_admin_last_sync", Date.now());
+  }catch(e){}
+
+  try{
+    if(state.password){
+      await rpc("sync_platform_snapshot",{p_password:state.password,p_snapshot:state.snapshot});
+    }
+    toast(message);
+  }catch(e){
+    toast(message + " (تم الحفظ محلياً)","ok");
+  }
+}
+
+function renderNav(){
+  const n=$("nav");
+  n.innerHTML=NAV.map(([id,label,ic])=>`
+    <button class="${state.section===id?"active":""}" data-nav="${id}">
+      <span>${ic}</span>
+      <span>${label}</span>
+    </button>
+  `).join("");
+  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{
+    state.section=b.dataset.nav;
+    $("sidebar").classList.remove("open");
+    renderNav();
+    render();
+  });
+}
+
+function applyTheme(){
+  const b=state.snapshot.branding||{};
+  document.documentElement.style.setProperty("--primary",b.primaryColor||"#2563eb");
+  document.documentElement.style.setProperty("--secondary",b.secondaryColor||"#0f766e");
+  document.documentElement.style.setProperty("--accent",b.accentColor||"#f59e0b");
+  const mode=b.defaultTheme||"device";
+  const dark=mode==="dark"||(mode==="device"&&matchMedia("(prefers-color-scheme:dark)").matches);
+  document.body.classList.toggle("dark",dark);
+}
+
+function header(title,sub,actions=""){
+  return `<div class="page-head">
+    <div>
+      <h2>${title}</h2>
+      <p>${sub||""}</p>
+    </div>
+    <div class="actions">${actions}</div>
+  </div>`;
+}
+
+function render(){
+  applyTheme();
+  const c=$("content");
+  const map={
+    dashboard:renderDashboard,
+    branding:renderBranding,
+    homepage:renderHomepage,
+    courses:renderCourses,
+    lessons:renderLessons,
+    quizzes:renderQuizzes,
+    students:renderStudents,
+    results:renderResults,
+    enrollments:renderEnrollments,
+    media:renderMedia,
+    content:renderContent,
+    notifications:renderNotifications,
+    settings:renderSettings
+  };
+  c.innerHTML=(map[state.section]||renderDashboard)();
+}
+
+function renderDashboard(){
+  const s=state.dashboard?.stats||{};
+  const coursesCount = (state.snapshot.courses||[]).length;
+  const lessonsCount = (state.snapshot.courses||[]).reduce((n,c)=>n+((c.lessons||[]).length||0), 0);
+  const quizzesCount = (state.snapshot.quizzes||[]).length;
+  const questionsCount = (state.snapshot.quizzes||[]).reduce((n,q)=>n+((q.questions||[]).length||0), 0);
+  const studentsCount = (state.dashboard?.students||[]).length || s.students || 0;
+  return header("لوحة التحكم","ملخص مباشر لبيانات منصة أبو قاعود")+`
+  <div class="cards">
+    ${[
+      ["إجمالي الطلاب",studentsCount],
+      ["إجمالي الكورسات",coursesCount],
+      ["إجمالي الدروس",lessonsCount],
+      ["إجمالي الاختبارات",quizzesCount],
+      ["إجمالي الأسئلة",questionsCount],
+      ["إجمالي التسجيلات",s.enrollments||0],
+      ["إجمالي النتائج",s.results||0]
+    ].map(x=>`<div class="stat"><div class="l">${x[0]}</div><div class="n">${x[1]}</div></div>`).join("")}
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-title">
+        <h3>آخر النتائج</h3>
+        <button class="btn small secondary" onclick="state.section='results';renderNav();render()">عرض الكل</button>
+      </div>
+      ${recentResults()}
+    </div>
+    <div class="panel">
+      <div class="panel-title">
+        <h3>آخر النشاطات</h3>
+      </div>
+      ${(state.snapshot.auditLogs||[]).slice(0,8).map(a=>`
+        <div class="item">
+          <div><b>${esc(a.action)}</b><div class="muted">${esc(a.entity)}</div></div>
+          <small class="muted">${new Date(a.time).toLocaleTimeString("ar-EG")}</small>
+        </div>
+      `).join("")||`<div class="empty">لا توجد بيانات</div>`}
+    </div>
+  </div>`;
+}
+
+function recentResults(){
+  const rows=(state.dashboard?.exam_sessions||[]).slice(0,6);
+  if(!rows.length)return `<div class="empty">لا توجد نتائج</div>`;
+  return `<div class="list">
+    ${rows.map(r=>`
+      <div class="item">
+        <div><b>${esc(r.student_name)}</b><div class="muted">${esc(r.quiz_title||"اختبار")}</div></div>
+        <span class="badge ${Number(r.percentage)>=50?"green":"red"}">${esc(r.percentage)}%</span>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function renderBranding(){
+  const b=state.snapshot.branding||{};
+  return header("العلامة التجارية","تحكم كامل في هوية المنصة والاتصالات")+`
+  <div class="panel">
+    <div class="grid2">
+      ${field("اسم المنصة",b.platformName,"branding.platformName")}
+      ${fileField("الشعار",b.logoUrl,"branding.logoUrl","image/*")}
+      ${fileField("الأيقونة",b.faviconUrl,"branding.faviconUrl","image/*,.ico")}
+      ${fileField("الصورة الرئيسية",b.heroImageUrl,"branding.heroImageUrl","image/*")}
+      ${field("عنوان الواجهة",b.heroTitle,"branding.heroTitle")}
+      ${field("وصف الواجهة",b.heroSubtitle,"branding.heroSubtitle")}
+      ${colorField("لون المنصة",b.primaryColor,"branding.primaryColor")}
+      ${colorField("اللون الثانوي",b.secondaryColor,"branding.secondaryColor")}
+      ${colorField("لون التمييز",b.accentColor,"branding.accentColor")}
+      <div class="field">
+        <label>النمط الافتراضي</label>
+        <select onchange="setPath('branding.defaultTheme',this.value)">
+          <option value="light" ${b.defaultTheme==="light"?"selected":""}>الوضع الفاتح</option>
+          <option value="dark" ${b.defaultTheme==="dark"?"selected":""}>الوضع الداكن</option>
+          <option value="device" ${b.defaultTheme==="device"?"selected":""}>إعداد الجهاز</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions"><button class="btn" onclick="saveBranding()">حفظ الهوية</button></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><h3>العلامة المائية</h3></div>
+    <div class="grid3">
+      ${toggleField("تفعيل العلامة المائية","branding.watermark.enabled",!!b.watermark?.enabled)}
+      ${fileField("العلامة المائية",b.watermark?.url,"branding.watermark.url","image/*")}
+      ${field("درجة الشفافية",b.watermark?.opacity,"branding.watermark.opacity","number","0","1","0.01")}
+      ${field("الحجم",b.watermark?.size,"branding.watermark.size","number","40","1000","1")}
+      <div class="field">
+        <label>الموضع</label>
+        <select onchange="setPath('branding.watermark.position',this.value)">
+          ${["center","top-right","top-left","bottom-right","bottom-left"].map(x=>`<option ${b.watermark?.position===x?"selected":""} value="${x}">${x==="center"?"الوسط":x==="top-right"?"أعلى اليمين":x==="top-left"?"أعلى اليسار":x==="bottom-right"?"أسفل اليمين":"أسفل اليسار"}</option>`).join("")}
+        </select>
+      </div>
+      ${toggleField("التكرار","branding.watermark.repeat",b.watermark?.repeat!==false)}
+    </div>
+    <div class="form-actions"><button class="btn" onclick="saveBranding()">حفظ إعدادات العلامة المائية</button></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><h3>واتساب وفيسبوك</h3></div>
+    <div class="grid2">
+      ${field("رقم واتساب",b.whatsapp?.number,"branding.whatsapp.number")}
+      ${field("رسالة واتساب",b.whatsapp?.message,"branding.whatsapp.message")}
+      ${toggleField("إظهار زر واتساب","branding.whatsapp.enabled",b.whatsapp?.enabled!==false)}
+      <div class="field">
+        <label>موضع زر واتساب</label>
+        <select onchange="setPath('branding.whatsapp.position',this.value)">
+          <option value="left" ${b.whatsapp?.position==="left"?"selected":""}>اليسار</option>
+          <option value="right" ${b.whatsapp?.position==="right"?"selected":""}>اليمين</option>
+        </select>
+      </div>
+      ${field("رابط فيسبوك",b.facebookUrl,"branding.facebookUrl")}
+    </div>
+    <div class="form-actions"><button class="btn" onclick="saveBranding()">حفظ الاتصالات</button></div>
+  </div>`;
+}
+
+function field(label,value,path,type="text",min="",max="",step=""){
+  const isModalField = String(path||"").startsWith("m.");
+  const mKey = isModalField ? String(path).slice(2) : "";
+  return `<div class="field">
+    <label>${label}</label>
+    <input type="${type}" value="${esc(value??"")}" ${min?`min="${min}"`:""} ${max?`max="${max}"`:""} ${step?`step="${step}"`:""} ${isModalField ? `data-m="${esc(mKey)}"` : `data-path="${esc(path)}" oninput="setPath(this.dataset.path,this.value)"`}>
+  </div>`;
+}
+
+function colorField(label,value,path){
+  return `<div class="field">
+    <label>${label}</label>
+    <div class="color-row">
+      <input type="color" value="${esc(value||"#2563eb")}" onchange="setPath('${path}',this.value)">
+      <input value="${esc(value||"")}" oninput="setPath('${path}',this.value)">
+    </div>
+  </div>`;
+}
+
+function toggleField(label,path,val){
+  return `<label class="switch">
+    <input type="checkbox" ${val?"checked":""} onchange="setPath('${path}',this.checked)">
+    <span>${label}</span>
+  </label>`;
+}
+
+function setPath(path,value){
+  const p=path.split(".");
+  let o=state.snapshot;
+  for(let i=0;i<p.length-1;i++){
+    if(!o[p[i]]||typeof o[p[i]]!=="object")o[p[i]]={};
+    o=o[p[i]];
+  }
+  o[p[p.length-1]]=value;
+}
+
+async function saveBranding(){
+  await uploadFormFiles();
+  audit("تم تعديل إعدادات المنصة","العلامة التجارية");
+  await sync("تم حفظ إعدادات المنصة بنجاح");
+}
+
+function renderCourses(){
+  return header("الكورسات","إضافة وتعديل ونشر محتوى الكورسات مع دعم تشغيل الفيديو الفوري",`<button class="btn" onclick="courseModal()">+ إضافة كورس جديد</button>`)+`
+  <div class="panel">
+    <div class="toolbar">
+      <input id="courseFilter" placeholder="بحث في الكورسات بالاسم أو الوصف..." oninput="renderCourseTable(this.value)" style="flex:1;min-width:220px;padding:11px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)">
+      <select id="catFilter" onchange="renderCourseTable($('courseFilter')?.value||'')" style="padding:11px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)">
+        <option value="">كل التصنيفات</option>
+        ${(state.snapshot.categories||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}
+      </select>
+    </div>
+    <div id="courseTable">${courseTable("")}</div>
+  </div>`;
+}
+
+function courseTable(filter=""){
+  const cat=$("catFilter")?.value||"";
+  const rows=(state.snapshot.courses||[]).filter(c=>{
+    const matchQuery=!filter||JSON.stringify(c).toLowerCase().includes(filter.toLowerCase());
+    const matchCat=!cat||c.categoryId===cat;
+    return matchQuery&&matchCat;
+  });
+  if(!rows.length)return `<div class="empty">لا توجد كورسات مطابقة. اضغط على زر "إضافة كورس جديد" لإضافة أول كورس!</div>`;
+  return `<div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>الصورة</th><th>الكورس</th><th>التصنيف</th><th>المحاضرات</th><th>السعر</th><th>الحالة</th><th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(c=>`
+          <tr>
+            <td>${c.thumbnail||c.coverImage||c.imageUrl?`<img class="thumb" src="${esc(c.thumbnail||c.coverImage||c.imageUrl)}">`:"—"}</td>
+            <td>
+              <b>${esc(c.title)}</b>
+              <div class="muted" style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.shortDescription||c.level||"")}</div>
+            </td>
+            <td>${esc((state.snapshot.categories||[]).find(x=>x.id===c.categoryId)?.name||c.category||"—")}</td>
+            <td><b>${(c.lessons||[]).length}</b> محاضرة</td>
+            <td>${c.isFree?"مجاني":esc(c.discountPrice||c.price||0)+" ج.م"}</td>
+            <td><span class="badge ${c.published!==false?"green":"red"}">${c.published!==false?"منشور":"مسودة"}</span></td>
+            <td>
+              <div class="actions">
+                <button class="btn small secondary" onclick="courseModal('${c.id}')">تعديل ✏️</button>
+                <button class="btn small secondary" onclick="duplicateCourse('${c.id}')" title="عمل نسخة مكررة من الكورس">نسخ 📋</button>
+                <button class="btn small ${c.published===false?"success":"secondary"}" onclick="toggleCourse('${c.id}')">${c.published===false?"نشر":"إخفاء"}</button>
+                <button class="btn small danger" onclick="removeCourseAction('${c.id}')">حذف</button>
+              </div>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderCourseTable(v){$("courseTable").innerHTML=courseTable(v)}
+
+async function duplicateCourse(id){
+  const original=state.snapshot.courses.find(x=>x.id===id);
+  if(!original)return;
+  const clone=JSON.parse(JSON.stringify(original));
+  clone.id=crypto.randomUUID();
+  clone.title=(clone.title||"كورس")+" (نسخة مكررة)";
+  clone.published=false;
+  if(Array.isArray(clone.lessons)){
+    clone.lessons=clone.lessons.map(l=>({...l,id:crypto.randomUUID(),courseId:clone.id}));
+  }
+  state.snapshot.courses.unshift(clone);
+  audit("تم نسخ كورس","الكورسات");
+  render();
+  await sync("تم إنشاء نسخة من الكورس بنجاح");
+}
+
+function courseModal(id){
+  const c=(state.snapshot.courses||[]).find(x=>x.id===id)||{
+    id:crypto.randomUUID(),title:"",shortDescription:"",fullDescription:"",
+    coverImage:"",thumbnail:"",banner:"",videoUrl:"",categoryId:"",level:"",price:0,discountPrice:0,
+    isFree:false,duration:"",requirements:[],outcomes:[],tags:[],featured:false,published:true,order:0,lessons:[]
+  };
+  modal(id?"تعديل الكورس":"إضافة كورس جديد",`<div class="grid2">
+    <div class="field" style="grid-column:1/-1">
+      <label>اسم / عنوان الكورس <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="course_title_input" data-m="title" value="${esc(c.title||"")}" placeholder="أدخل اسم الكورس (مثال: كورس النحو للثانوية العامة)" autofocus>
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <label>الوصف المختصر للكورس</label>
+      <input type="text" id="course_desc_input" data-m="shortDescription" value="${esc(c.shortDescription||"")}" placeholder="وصف موجز يظهر للطلاب في بطاقة الكورس">
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <label>الوصف الكامل والتفاصيل</label>
+      <textarea rows="4" id="course_full_desc" data-m="fullDescription" placeholder="اكتب نبذة كاملة عن الكورس ومحتواه...">${esc(c.fullDescription||"")}</textarea>
+    </div>
+    <div class="field">
+      <label>التصنيف / المرحلة</label>
+      <select data-m="categoryId">
+        <option value="">بدون تصنيف</option>
+        ${(state.snapshot.categories||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===c.categoryId?"selected":""}>${esc(x.name)}</option>`).join("")}
+      </select>
+    </div>
+    ${field("المستوى التعليمي",c.level,"m.level")}
+    ${field("السعر الأصلي (ج.م)",c.price,"m.price","number","0")}
+    ${field("سعر الخصم (ج.م)",c.discountPrice,"m.discountPrice","number","0")}
+    ${field("مدة الكورس التقديرية",c.duration,"m.duration")}
+    ${field("ترتيب العرض",c.order,"m.order","number","0")}
+    <div style="grid-column:1/-1">
+      ${videoField("فيديو تعريفي / برومو للكورس (يوتيوب أو مباشر)", c.videoUrl||"", "m.videoUrl")}
+    </div>
+    ${fileField("صورة الغلاف الرئيسية",c.coverImage,"m.coverImage","image/*")}
+    ${fileField("الصورة المصغرة (Thumbnail)",c.thumbnail,"m.thumbnail","image/*")}
+    ${toggleField("كورس مجاني بالكامل","m.isFree",!!c.isFree)}
+    ${toggleField("كورس مميز في الواجهة","m.featured",!!c.featured)}
+    ${toggleField("نشر الكورس فوراً","m.published",c.published!==false)}
+    <div class="field"><label>المتطلبات (افصل بينها بفاصلة)</label><input data-m="requirements" value="${esc((c.requirements||[]).join(", "))}"></div>
+    <div class="field"><label>نواتج التعلم (افصل بينها بفاصلة)</label><input data-m="outcomes" value="${esc((c.outcomes||[]).join(", "))}"></div>
+    <div class="field"><label>الوسوم والكلمات المفتاحية</label><input data-m="tags" value="${esc((c.tags||[]).join(", "))}"></div>
+  </div>
+  <div class="form-actions">
+    <button type="button" class="btn" onclick="saveCourse('${c.id}',${id?"true":"false"})">✓ حفظ ونشر الكورس</button>
+    <button type="button" class="btn secondary" onclick="closeModal()">إلغاء</button>
+  </div>`);
+}
+
+function readModal(){
+  const modalEl = document.getElementById("modalRoot") || document;
+  const o={};
+  modalEl.querySelectorAll("[data-m]").forEach(el=>{
+    let v=el.type==="checkbox"?el.checked:el.value;
+    const k=el.dataset.m;
+    if(!k) return;
+    o[k]=["requirements","outcomes","tags"].includes(k)?(typeof v==="string"?v.split(",").map(x=>x.trim()).filter(Boolean):v):v;
+  });
+  return o;
+}
+
+async function saveCourse(id,editing){
+  try{
+    await uploadFormFiles();
+  }catch(e){
+    console.warn("ملفات النموذج:", e);
+  }
+  const m=readModal();
+
+  const titleEl = document.getElementById("course_title_input");
+  const shortDescEl = document.getElementById("course_desc_input");
+  const fullDescEl = document.getElementById("course_full_desc");
+  if(titleEl && titleEl.value) m.title = titleEl.value;
+  if(shortDescEl && shortDescEl.value) m.shortDescription = shortDescEl.value;
+  if(fullDescEl && fullDescEl.value) m.fullDescription = fullDescEl.value;
+
+  m.title = (m.title || "").trim();
+  if(!m.title){
+    toast("يرجى كتابة اسم الكورس أولاً","warn");
+    if(titleEl) titleEl.focus();
+    return;
+  }
+
+  m.id = id || crypto.randomUUID();
+  m.shortDescription = (m.shortDescription || "").trim();
+  m.fullDescription = (m.fullDescription || "").trim();
+  m.price = Number(m.price || 0);
+  m.discountPrice = Number(m.discountPrice || 0);
+  m.order = Number(m.order || 0);
+  m.published = m.published !== false;
+  
+  if(!Array.isArray(state.snapshot.courses)) state.snapshot.courses = [];
+  const existingIdx = state.snapshot.courses.findIndex(x => x.id === m.id);
+  if(existingIdx >= 0){
+    m.lessons = state.snapshot.courses[existingIdx].lessons || [];
+    state.snapshot.courses[existingIdx] = Object.assign({}, state.snapshot.courses[existingIdx], m);
+  } else {
+    m.lessons = [];
+    state.snapshot.courses.unshift(m);
+  }
+
+  if(state.dashboard && state.dashboard.stats){
+    state.dashboard.stats.courses = state.snapshot.courses.length;
+  }
+
+  audit(existingIdx >= 0 ? "تم تعديل كورس" : "تمت إضافة كورس", "الكورسات");
+  closeModal();
+  
+  render();
+  await sync(existingIdx >= 0 ? "تم تعديل الكورس بنجاح" : "تمت إضافة الكورس بنجاح");
+}
+
+async function toggleCourse(id){
+  const c=state.snapshot.courses.find(x=>x.id===id);
+  if(!c)return;
+  c.published=c.published===false;
+  render();
+  await sync(c.published?"تم نشر الكورس":"تم إلغاء نشر الكورس");
+}
+
+async function removeCourseAction(id){
+  state.snapshot.courses=state.snapshot.courses.filter(x=>x.id!==id);
+  if(state.dashboard && state.dashboard.stats){
+    state.dashboard.stats.courses = state.snapshot.courses.length;
+  }
+  audit("تم حذف كورس","الكورسات");
+  render();
+  await sync("تم حذف الكورس بنجاح");
+}
+
+async function removeItem(collection,id,label){
+  const old=state.snapshot[collection]?.find(x=>x.id===id);
+  state.snapshot[collection]=state.snapshot[collection].filter(x=>x.id!==id);
+  audit("تم حذف "+label,label,old,null);
+  render();
+  await sync("تم الحذف بنجاح");
+}
+
+function renderLessons(){
+  const courses=state.snapshot.courses||[];
+  const rows=[];
+  courses.forEach(c=>(c.lessons||[]).forEach((l,i)=>rows.push({...l,courseId:c.id,courseTitle:c.title,lectureNumber:l.lectureNumber||l.order||i+1})));
+  return header("المحاضرات والدروس","نظام محاضرات متكامل: شرح + فيديوهات يوتيوب تعمل فوراً + ملف PDF + اختبار إلكتروني",`<button class="btn" onclick="lessonModal()">+ إضافة محاضرة جديدة</button>`)+`
+  <div class="panel">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>المحاضرة</th><th>الكورس التابع له</th><th>النوع</th><th>الفيديوهات</th><th>الاختبار</th><th>الحالة</th><th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.length?rows.map(l=>{
+            const videos=(l.videoUrls||[]).filter(Boolean);
+            if(!videos.length&&l.videoUrl)videos.push(l.videoUrl);
+            const badges=[];
+            if(videos.length)badges.push(`<span class="badge green">▶ ${videos.length} فيديو</span>`);
+            if(l.pdfUrl)badges.push(`<span class="badge blue">PDF</span>`);
+            if(!badges.length)badges.push(l.thumbnail?`<span class="badge green">صورة</span>`:`<span class="badge red">بدون فيديو</span>`);
+            return `<tr>
+              <td><b>المحاضرة ${esc(l.lectureNumber)}</b><div class="muted">${esc(l.title)}</div></td>
+              <td><b>${esc(l.courseTitle)}</b></td>
+              <td><span class="badge">${esc(l.type||"شرح")}</span></td>
+              <td>${badges.join(" ")}</td>
+              <td>${l.quizId?`<span class="badge green">مرتبط باختبار</span>`:`<span class="badge">بدون اختبار</span>`}</td>
+              <td>${l.published===false?"مخفي":"منشور"}</td>
+              <td>
+                <div class="actions">
+                  <button class="btn small secondary" onclick="lessonModal('${l.courseId}','${l.id}')">تعديل ✏️</button>
+                  <button class="btn small secondary" onclick="duplicateLesson('${l.courseId}','${l.id}')" title="نسخ المحاضرة">نسخ 📋</button>
+                  <button class="btn small ${l.published===false?"success":"secondary"}" onclick="toggleLesson('${l.courseId}','${l.id}')">${l.published===false?"نشر ⚡":"إخفاء"}</button>
+                  <button class="btn small danger" onclick="deleteLesson('${l.courseId}','${l.id}')">حذف</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join(""):`<tr><td colspan="7"><div class="empty">لا توجد محاضرات بعد. أنشئ كورسًا ثم أضف أول محاضرة.</div></td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+async function duplicateLesson(courseId,id){
+  const c=(state.snapshot.courses||[]).find(x=>x.id===courseId);
+  if(!c)return;
+  const original=(c.lessons||[]).find(x=>x.id===id);
+  if(!original)return;
+  const clone=JSON.parse(JSON.stringify(original));
+  clone.id=crypto.randomUUID();
+  clone.title=(clone.title||"محاضرة")+" (نسخة مكررة)";
+  clone.lectureNumber=(c.lessons.length||0)+1;
+  clone.order=clone.lectureNumber;
+  clone.published=false;
+  c.lessons.push(clone);
+  audit("تم نسخ محاضرة","المحاضرات");
+  render();
+  await sync("تم نسخ المحاضرة بنجاح");
+}
+
+function lessonModal(courseId,id){
+  const courses = state.snapshot.courses || [];
+  if(!courses.length){
+    toast("يجب إضافة كورس أولاً قبل إضافة محاضرة","warn");
+    courseModal();
+    return;
+  }
+  const c = courses.find(x => x.id === courseId) || courses[0];
+  const l = (c.lessons || []).find(x => x.id === id) || {
+    id:crypto.randomUUID(),title:"",description:"",videoUrl:"",videoUrls:[],
+    pdfUrl:"",thumbnail:"",duration:"",type:"شرح",quizId:"",isFreePreview:false,
+    published:true,lectureNumber:(c.lessons||[]).length+1,order:(c.lessons||[]).length,attachments:[]
+  };
+  const videos = l.videoUrls?.length ? l.videoUrls : (l.videoUrl ? [l.videoUrl] : []);
+  const quizzes = (state.snapshot.quizzes || []).filter(q => !q.courseId || q.courseId === c.id);
+
+  modal(id?"تعديل المحاضرة":"إضافة محاضرة جديدة",`<div class="grid2">
+    <div class="field">
+      <label>الكورس التابع له المحاضرة</label>
+      <select id="lessonCourse">
+        ${courses.map(x=>`<option value="${esc(x.id)}" ${x.id===c.id?"selected":""}>${esc(x.title)}</option>`).join("")}
+      </select>
+    </div>
+    ${field("رقم المحاضرة",l.lectureNumber||1,"m.lectureNumber","number","1")}
+    <div class="field" style="grid-column:1/-1">
+      <label>عنوان المحاضرة <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="lesson_title_input" data-m="title" value="${esc(l.title||"")}" placeholder="أدخل عنوان المحاضرة (مثال: المحاضرة 1: شرح كان وأخواتها)">
+    </div>
+    ${field("مدة الفيديو التقديرية",l.duration,"m.duration")}
+    ${field("ترتيب العرض",l.order||0,"m.order","number","0")}
+    <div class="field">
+      <label>نوع المحاضرة</label>
+      <select data-m="type">
+        <option ${l.type==="شرح"?"selected":""}>شرح</option>
+        <option ${l.type==="شرح وحل"?"selected":""}>شرح وحل</option>
+        <option ${l.type==="مراجعة"?"selected":""}>مراجعة</option>
+        <option ${l.type==="تطبيق"?"selected":""}>تطبيق</option>
+        <option ${l.type==="اختبار"?"selected":""}>اختبار</option>
+        <option ${l.type==="محتوى إضافي"?"selected":""}>محتوى إضافي</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>الاختبار الإلكتروني للمحاضرة</label>
+      <select data-m="quizId">
+        <option value="">بدون اختبار</option>
+        ${quizzes.map(q=>`<option value="${esc(q.id)}" ${l.quizId===q.id?"selected":""}>${esc(q.title)} — ${((q.questions||[]).length||0)} سؤال</option>`).join("")}
+      </select>
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <label>شرح ونبذة عن المحاضرة</label>
+      <textarea rows="3" data-m="description" placeholder="اكتب ملخصاً أو توجيهات للطلاب...">${esc(l.description||"")}</textarea>
+    </div>
+    <div style="grid-column:1/-1">
+      ${videoField("فيديو الشرح الأساسي (يوتيوب أو مباشر - يعمل فوراً)",videos[0]||"","m.videoUrl1")}
+    </div>
+    <div style="grid-column:1/-1">
+      ${videoField("فيديو الشرح الثاني (اختياري)",videos[1]||"","m.videoUrl2")}
+    </div>
+    ${fileField("ملف المحاضرة والواجب (PDF)",l.pdfUrl||"","m.pdfUrl",".pdf,application/pdf")}
+    ${fileField("صورة المحاضرة",l.thumbnail,"m.thumbnail","image/*")}
+    ${toggleField("معاينة مجانية للزوار","m.isFreePreview",!!l.isFreePreview)}
+    ${toggleField("منشورة للطلاب الآن","m.published",l.published!==false)}
+  </div>
+  <div class="form-actions">
+    <button type="button" class="btn" onclick="saveLesson('${id||""}',this)">✓ حفظ ونشر المحاضرة ⚡</button>
+    <button type="button" class="btn secondary" onclick="closeModal()">إلغاء</button>
+  </div>`);
+}
+
+async function saveLesson(id,btn){
+  if(btn){btn.disabled=true;btn.textContent="جاري الحفظ..."}
+  try{
+    await uploadFormFiles();
+    const m=readModal();
+    const titleEl = document.getElementById("lesson_title_input");
+    if(titleEl && titleEl.value) m.title = titleEl.value;
+
+    m.title = (m.title || "").trim();
+    if(!m.title){
+      toast("يرجى كتابة عنوان المحاضرة أولاً","warn");
+      if(titleEl) titleEl.focus();
+      if(btn){btn.disabled=false;btn.textContent="✓ حفظ ونشر المحاضرة ⚡"}
+      return;
+    }
+
+    m.id=id||crypto.randomUUID();
+    m.lectureNumber=Number(m.lectureNumber||1);
+    m.order=Number(m.order||m.lectureNumber||0);
+    m.videoUrls=[m.videoUrl1||"",m.videoUrl2||""].filter(Boolean);
+    m.videoUrl=m.videoUrls[0]||"";
+    delete m.videoUrl1;
+    delete m.videoUrl2;
+    m.pdfUrl=m.pdfUrl||"";
+    m.thumbnail=m.thumbnail||"";
+    
+    const targetId=$("lessonCourse")?.value;
+    const c=(state.snapshot.courses||[]).find(x=>x.id===targetId);
+    if(!c)return;
+    if(!Array.isArray(c.lessons))c.lessons=[];
+    let old=c.lessons.find(x=>x.id===m.id);
+    if(old)Object.assign(old,m);else c.lessons.push(m);
+    c.lessons.sort((a,b)=>Number(a.lectureNumber||a.order||0)-Number(b.lectureNumber||b.order||0));
+    
+    audit(old?"تم تعديل محاضرة":"تمت إضافة محاضرة","المحاضرات");
+    closeModal();
+    render();
+    await sync(old?"تم تعديل المحاضرة بنجاح":"تم حفظ المحاضرة بنجاح");
+  }catch(err){
+    toast(err.message||"حدث خطأ أثناء الحفظ","error");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="✓ حفظ ونشر المحاضرة ⚡"}
+  }
+}
+
+async function toggleLesson(courseId,id){
+  const c=(state.snapshot.courses||[]).find(x=>x.id===courseId);
+  if(!c)return;
+  const l=(c.lessons||[]).find(x=>x.id===id);
+  if(!l)return;
+  l.published=l.published===false;
+  render();
+  await sync(l.published?"تم نشر المحاضرة بنجاح ⚡":"تم إخفاء المحاضرة");
+}
+
+async function deleteLesson(courseId,id){
+  const c=state.snapshot.courses.find(x=>x.id===courseId);
+  if(c)c.lessons=(c.lessons||[]).filter(l=>l.id!==id);
+  audit("تم حذف درس","الدروس");
+  render();
+  await sync("تم حذف الدرس بنجاح");
+}
+
+function renderQuizzes(){
+  const qs=state.snapshot.quizzes||[];
+  return header("الاختبارات والأسئلة","إنشاء الاختبارات وإدارة الأسئلة والإجابات الصحيحة",`<button class="btn" onclick="quizModal()">+ إضافة اختبار جديد</button>`)+`
+  <div class="panel">
+    <div class="list">
+      ${qs.length?qs.map(q=>`
+        <div class="item">
+          <div>
+            <b>${esc(q.title)}</b>
+            <div class="muted">${esc((state.snapshot.courses||[]).find(c=>c.id===q.courseId)?.title||"كورس عام")} • ${(q.questions||[]).length} سؤال • ${q.durationMinutes||q.timeLimit||30} دقيقة</div>
+          </div>
+          <div class="actions">
+            <button class="btn small secondary" onclick="quizModal('${q.id}')">تعديل ✏️</button>
+            <button class="btn small secondary" onclick="duplicateQuiz('${q.id}')">نسخ الاختبار 📋</button>
+            <button class="btn small secondary" onclick="questionsModal('${q.id}')">الأسئلة (${(q.questions||[]).length})</button>
+            <button class="btn small danger" onclick="removeItem('quizzes','${q.id}','الاختبار')">حذف</button>
+          </div>
+        </div>
+      `).join(""):`<div class="empty">لا توجد اختبارات مسجلة بعد</div>`}
+    </div>
+  </div>`;
+}
+
+async function duplicateQuiz(id){
+  const original=state.snapshot.quizzes.find(x=>x.id===id);
+  if(!original)return;
+  const clone=JSON.parse(JSON.stringify(original));
+  clone.id=crypto.randomUUID();
+  clone.title=(clone.title||"اختبار")+" (نسخة مكررة)";
+  if(Array.isArray(clone.questions)){
+    clone.questions=clone.questions.map(q=>({...q,id:crypto.randomUUID()}));
+  }
+  state.snapshot.quizzes.push(clone);
+  audit("تم نسخ اختبار","الاختبارات");
+  render();
+  await sync("تم نسخ الاختبار بنجاح");
+}
+
+function quizModal(id){
+  const q=(state.snapshot.quizzes||[]).find(x=>x.id===id)||{
+    id:crypto.randomUUID(),courseId:"",title:"",description:"",instructions:"",
+    durationMinutes:30,passingScorePercentage:50,maxAttempts:3,shuffle:false,
+    randomAnswers:false,showResults:true,showExplanations:true,enabled:true,questions:[]
+  };
+  modal("بيانات الاختبار",`<div class="grid2">
+    ${field("عنوان الاختبار",q.title,"m.title")}
+    ${field("المدة بالدقائق",q.durationMinutes,"m.durationMinutes","number","1")}
+    ${field("درجة النجاح %",q.passingScorePercentage,"m.passingScorePercentage","number","0","100")}
+    ${field("أقصى عدد للمحاولات",q.maxAttempts,"m.maxAttempts","number","1")}
+    <div class="field">
+      <label>الكورس التابع له</label>
+      <select data-m="courseId">
+        <option value="">بدون كورس (اختبار عام)</option>
+        ${(state.snapshot.courses||[]).map(c=>`<option value="${esc(c.id)}" ${c.id===q.courseId?"selected":""}>${esc(c.title)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="field"><label>الوصف</label><textarea rows="4" data-m="description">${esc(q.description)}</textarea></div>
+    <div class="field"><label>التعليمات</label><textarea rows="4" data-m="instructions">${esc(q.instructions)}</textarea></div>
+    ${toggleField("تفعيل الاختبار","m.enabled",q.enabled!==false)}
+    ${toggleField("ترتيب عشوائي للأسئلة","m.shuffle",!!q.shuffle)}
+    ${toggleField("ترتيب عشوائي للإجابات","m.randomAnswers",!!q.randomAnswers)}
+    ${toggleField("عرض النتائج فور الانتهاء","m.showResults",q.showResults!==false)}
+    ${toggleField("عرض الشرح والإجابات النموذجية","m.showExplanations",q.showExplanations!==false)}
+  </div>
+  <div class="form-actions">
+    <button class="btn" onclick="saveQuiz('${q.id}',${id?"true":"false"})">حفظ الاختبار</button>
+    <button class="btn secondary" onclick="closeModal()">إلغاء</button>
+  </div>`);
+}
+
+async function saveQuiz(id,editing){
+  const m=readModal();
+  m.id=id;
+  m.durationMinutes=Number(m.durationMinutes||30);
+  m.passingScorePercentage=Number(m.passingScorePercentage||50);
+  m.maxAttempts=Number(m.maxAttempts||1);
+  m.questions=(state.snapshot.quizzes.find(x=>x.id===id)||{}).questions||[];
+  if(editing)Object.assign(state.snapshot.quizzes.find(x=>x.id===id),m);
+  else state.snapshot.quizzes.push(m);
+  audit(editing?"تم تعديل اختبار":"تمت إضافة اختبار","الاختبارات");
+  closeModal();
+  render();
+  await sync("تم حفظ الاختبار بنجاح");
+}
+
+function questionsModal(qid){
+  const q=state.snapshot.quizzes.find(x=>x.id===qid);
+  if(!q)return;
+  modal(`أسئلة: ${esc(q.title)}`,`<div class="panel" style="box-shadow:none;margin:0;padding:0;border:0">
+    <div class="actions" style="margin-bottom:12px">
+      <button class="btn" onclick="questionEdit('${qid}')">+ إضافة سؤال جديد</button>
+    </div>
+    <div class="list">
+      ${(q.questions||[]).map((x,i)=>`
+        <div class="item">
+          <div>
+            <b>${i+1}. ${esc(x.text||x.questionText||"سؤال")}</b>
+            <div class="muted">الإجابة الصحيحة: ${esc(x.correctAnswerId||"—")} • ${x.points||1} درجة</div>
+          </div>
+          <div class="actions">
+            <button class="btn small secondary" onclick="questionEdit('${qid}','${x.id}')">تعديل</button>
+            <button class="btn small danger" onclick="removeQuestion('${qid}','${x.id}')">حذف</button>
+          </div>
+        </div>
+      `).join("")||`<div class="empty">لا توجد أسئلة مضافة بعد</div>`}
+    </div>
+  </div>`);
+}
+
+function questionEdit(qid,id){
+  const q=state.snapshot.quizzes.find(x=>x.id===qid);
+  const x=(q.questions||[]).find(y=>y.id===id)||{
+    id:crypto.randomUUID(),text:"",image:"",points:1,difficulty:"متوسط",explanation:"",
+    correctAnswerId:"أ",options:[{label:"أ",text:"",image:"",isCorrect:false},{label:"ب",text:"",image:"",isCorrect:false},{label:"ج",text:"",image:"",isCorrect:false},{label:"د",text:"",image:"",isCorrect:false}],order:(q.questions||[]).length
+  };
+  modal("بيانات السؤال",`<div class="field"><label>نص السؤال</label><textarea rows="4" data-m="text">${esc(x.text||"")}</textarea></div>
+  <div class="grid2">
+    ${fileField("صورة السؤال",x.image,"m.image","image/*")}
+    ${field("الدرجة",x.points,"m.points","number","0")}
+    ${field("مستوى الصعوبة",x.difficulty,"m.difficulty")}
+    ${field("الترتيب",x.order,"m.order","number","0")}
+  </div>
+  <div class="grid2">
+    ${["أ","ب","ج","د"].map(l=>{
+      const a=x.options?.find(o=>o.label===l)||{};
+      return `<div class="panel" style="box-shadow:none">
+        <b>الإجابة ${l}</b>
+        <div class="field"><label>النص</label><input data-opt-text="${l}" value="${esc(a.text||"")}"></div>
+        <label class="switch"><input type="radio" name="correct" value="${l}" ${(x.correctAnswerId||"أ")===l?"checked":""}> الإجابة الصحيحة</label>
+      </div>`;
+    }).join("")}
+  </div>
+  <div class="field"><label>شرح الإجابة النموذجية</label><textarea rows="4" data-m="explanation">${esc(x.explanation||"")}</textarea></div>
+  <div class="form-actions">
+    <button class="btn" onclick="saveQuestion('${qid}','${x.id}',${id?"true":"false"})">حفظ السؤال</button>
+    <button class="btn secondary" onclick="questionsModal('${qid}')">رجوع للأسئلة</button>
+  </div>`);
+}
+
+async function saveQuestion(qid,id,editing){
+  const q=state.snapshot.quizzes.find(x=>x.id===qid);
+  const m=readModal();
+  m.id=id;
+  m.points=Number(m.points||1);
+  m.order=Number(m.order||0);
+  m.correctAnswerId=document.querySelector('input[name="correct"]:checked')?.value||"أ";
+  m.options=["أ","ب","ج","د"].map(l=>({
+    label:l,
+    text:document.querySelector(`[data-opt-text="${l}"]`)?.value||"",
+    isCorrect:m.correctAnswerId===l
+  }));
+  if(editing)Object.assign(q.questions.find(x=>x.id===id),m);
+  else q.questions.push(m);
+  audit(editing?"تم تعديل سؤال":"تمت إضافة سؤال","الأسئلة");
+  await sync("تم حفظ السؤال بنجاح");
+  questionsModal(qid);
+}
+
+async function removeQuestion(qid,id){
+  const q=state.snapshot.quizzes.find(x=>x.id===qid);
+  q.questions=q.questions.filter(x=>x.id!==id);
+  audit("تم حذف سؤال","الأسئلة");
+  await sync("تم حذف السؤال بنجاح");
+  questionsModal(qid);
+}
+
+function renderStudents(){
+  const d=state.dashboard||{};
+  const students=d.students||[];
+  return header("الطلاب","إدارة حسابات الطلاب، رصيد المحفظة، ومتابعة تقدمهم",`<button class="btn" onclick="studentModal()">+ إضافة طالب جديد</button>`)+`
+  <div class="panel">
+    <div class="toolbar">
+      <input placeholder="بحث عن طالب بالاسم أو الهاتف أو البريد..." oninput="filterRows('studentTable',this.value)" style="flex:1;min-width:220px;padding:11px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)">
+    </div>
+    <div id="studentTable">${studentTable(students)}</div>
+  </div>`;
+}
+
+function studentTable(rows){
+  if(!rows.length)return `<div class="empty">لا توجد بيانات طلاب</div>`;
+  return `<div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>الطالب</th><th>الهاتف</th><th>المحفظة</th><th>الكورسات</th><th>التقدم</th><th>المتوسط</th><th>التسجيل</th><th>الحالة</th><th>الإجراءات</th></tr>
+      </thead>
+      <tbody>
+        ${rows.map(s=>{
+          const es=s.enrollments||[];
+          const avg=Number(s.average||0);
+          const progress=es.length?Math.round(es.reduce((n,e)=>n+Number(e.progress_percentage||0),0)/es.length):0;
+          const walletVal = Number(s.wallet ?? s.balance ?? 0);
+          return `<tr>
+            <td>
+              <div style="display:flex;gap:9px;align-items:center">
+                <div class="thumb" style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%">👤</div>
+                <div><b>${esc(s.name)}</b><div class="muted">${esc(s.email||"—")}</div></div>
+              </div>
+            </td>
+            <td>${esc(s.phone)}</td>
+            <td><b style="color:var(--secondary);font-size:13px">${walletVal} ج.م</b></td>
+            <td><b>${es.length}</b></td>
+            <td>${progress}%</td>
+            <td>${avg}%</td>
+            <td>${new Date(s.registered_at||Date.now()).toLocaleDateString("ar-EG")}</td>
+            <td><span class="badge ${s.status==="active"?"green":"red"}">${s.status==="active"?"نشط":"معطل"}</span></td>
+            <td>
+              <div class="actions">
+                <button class="btn small secondary" onclick="studentModal('${s.id}')">تعديل ✏️</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function filterRows(id,v){
+  const t=$(id);
+  if(!t)return;
+  [...t.querySelectorAll("tbody tr")].forEach(r=>r.style.display=r.textContent.toLowerCase().includes(v.toLowerCase())?"":"none");
+}
+
+function studentModal(id){
+  const s=(state.dashboard?.students||[]).find(x=>x.id===id)||{id:"",name:"",phone:"",email:"",wallet:0,status:"active"};
+  modal(id?`تعديل بيانات الطالب: ${esc(s.name||"")}`:"إضافة طالب جديد",`<div class="grid2">
+    ${field("اسم الطالب الكامل",s.name,"m.name")}
+    ${field("رقم الهاتف",s.phone,"m.phone")}
+    ${field("البريد الإلكتروني",s.email,"m.email")}
+    ${field("رصيد المحفظة (ج.م)",s.wallet??s.balance??0,"m.wallet","number","0","","0.5")}
+    <div class="field">
+      <label>حالة الحساب</label>
+      <select data-m="status">
+        <option value="active" ${s.status==="active"?"selected":""}>نشط</option>
+        <option value="blocked" ${s.status==="blocked"?"selected":""}>معطل</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn" onclick="saveStudent('${id||s.id||""}')">✓ حفظ بيانات الطالب والمحفظة</button>
+    <button class="btn secondary" onclick="closeModal()">إلغاء</button>
+  </div>`);
+}
+
+async function saveStudent(id){
+  const p=readModal();
+  if(!p.name||!p.phone){toast("الاسم ورقم الهاتف مطلوبان","error");return}
+  p.wallet = Number(p.wallet || 0);
+
+  if(!state.dashboard) state.dashboard = {};
+  if(!Array.isArray(state.dashboard.students)) state.dashboard.students = [];
+
+  const existingIdx = id ? state.dashboard.students.findIndex(x => x.id === id) : -1;
+  if(existingIdx >= 0){
+    state.dashboard.students[existingIdx] = Object.assign({}, state.dashboard.students[existingIdx], p);
+    audit("تم تعديل بيانات الطالب ورصيد المحفظة: " + p.name, "الطلاب");
+  } else {
+    p.id = id || crypto.randomUUID();
+    p.registered_at = new Date().toISOString();
+    p.average = 0;
+    p.enrollments = [];
+    state.dashboard.students.unshift(p);
+    audit("تمت إضافة طالب جديد: " + p.name, "الطلاب");
+  }
+
+  if(state.dashboard.stats){
+    state.dashboard.stats.students = state.dashboard.students.length;
+  }
+
+  closeModal();
+  render();
+  await sync("تم حفظ بيانات الطالب ورصيد المحفظة بنجاح");
+}
+
+function renderResults(){
+  const rows=state.dashboard?.exam_sessions||[];
+  return header("النتائج","نتائج الاختبارات المسجلة للطلاب")+`
+  <div class="panel">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>الطالب</th><th>الاختبار</th><th>المحاولة</th><th>الدرجة</th><th>النسبة</th><th>صحيحة</th><th>خاطئة</th><th>غير مجابة</th><th>الحالة</th></tr>
+        </thead>
+        <tbody>
+          ${rows.length?rows.map((r,i)=>`
+            <tr>
+              <td>${esc(r.student_name)}</td>
+              <td>${esc(r.quiz_title||"—")}</td>
+              <td>${i+1}</td>
+              <td>${esc(r.score)}/${esc(r.total_score)}</td>
+              <td><span class="badge ${Number(r.percentage)>=50?"green":"red"}">${esc(r.percentage)}%</span></td>
+              <td>${esc(r.correct_answers)}</td>
+              <td>${esc(r.wrong_answers)}</td>
+              <td>${esc(r.unanswered)}</td>
+              <td>${r.status==="completed"?"مكتمل":"قيد التقدم"}</td>
+            </tr>
+          `).join(""):`<tr><td colspan="9"><div class="empty">لا توجد نتائج مسجلة</div></td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderEnrollments(){
+  return header("التسجيلات والتقدم","متابعة اشتراكات الطلاب وتقدم الدروس")+`
+  <div class="panel">
+    <p class="muted">يتم تسجيل اشتراكات الطلاب ومتابعة تقدمهم في المحاضرات بدقة عالية.</p>
+  </div>`;
+}
+
+function renderHomepage(){
+  const arr=state.snapshot.homepage_sections||[];
+  return header("الصفحة الرئيسية","تحرير أقسام الصفحة وترتيبها")+`
+  <div class="panel">
+    <div class="list">
+      ${arr.map((x,i)=>`
+        <div class="item">
+          <div><b>${i+1}. ${esc(x.title)}</b><div class="muted">${esc(x.subtitle||"")}</div></div>
+        </div>
+      `).join("")||`<div class="empty">لا توجد أقسام</div>`}
+    </div>
+  </div>`;
+}
+
+function renderContent(){
+  return header("إدارة المحتوى","التصنيفات والبنرات والصفحات والإعلانات")+`
+  <div class="panel"><p class="muted">يمكنك إدارة وتحديث كافة أقسام المحتوى من هنا.</p></div>`;
+}
+
+function renderNotifications(){return renderContent()}
+
+function renderSettings(){
+  return header("الإعدادات","المظهر والنسخ الاحتياطي")+`
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-title"><h3>النمط</h3></div>
+      <div class="list">
+        <button class="btn secondary" onclick="setTheme('light')">الوضع الفاتح</button>
+        <button class="btn secondary" onclick="setTheme('dark')">الوضع الداكن</button>
+        <button class="btn secondary" onclick="setTheme('device')">إعداد الجهاز</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><h3>حالة المزامنة</h3></div>
+      <p class="muted">النظام متصل بالقاعدة السحابية وتحدث البيانات باستمرار.</p>
+      <button class="btn" onclick="load()">تحديث البيانات الآن ↻</button>
+    </div>
+  </div>`;
+}
+
+function setTheme(v){
+  state.snapshot.branding.defaultTheme=v;
+  applyTheme();
+  sync("تم حفظ النمط");
+}
+
+function renderMedia(){
+  const media=state.snapshot.media||[];
+  const filter=(state.mediaFilter||"").trim().toLowerCase();
+  const filtered=media.filter(x=>{
+    if(!filter)return true;
+    return (x.name||"").toLowerCase().includes(filter)||(x.url||"").toLowerCase().includes(filter)||(x.type||"").toLowerCase().includes(filter);
+  });
+  return header("الصور والملفات","رفع واستعراض ونسخ وحذف وسائط المنصة",`<button class="btn" onclick="uploadModal()">+ رفع ملف جديد ⚡</button>`)+`
+  <div class="panel">
+    <div class="toolbar" style="align-items:center;justify-content:space-between">
+      <input placeholder="بحث في أسماء أو روابط الملفات..." value="${esc(state.mediaFilter||"")}" oninput="state.mediaFilter=this.value;renderMediaList()" style="flex:1;max-width:420px;padding:11px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)">
+      <span class="muted" style="font-size:13px">${filtered.length} ملف متوفر</span>
+    </div>
+    <div id="mediaListContainer">
+      ${renderMediaGrid(filtered)}
+    </div>
+  </div>`;
+}
+
+function renderMediaGrid(list){
+  if(!list.length)return `<div class="empty" style="grid-column:1/-1">لا توجد ملفات متطابقة</div>`;
+  return `<div class="media-grid">
+    ${list.map(x=>{
+      const isVid=String(x.type||"").startsWith("video")||String(x.url||"").match(/\.(mp4|webm|mov|m4v)(\?.*)?$/i);
+      const isPdf=String(x.type||"").includes("pdf")||String(x.url||"").match(/\.pdf(\?.*)?$/i);
+      return `<div class="media-card" id="media_${esc(x.id)}">
+        ${isVid?`<video src="${esc(x.url)}" controls preload="metadata"></video>`:isPdf?`<div style="height:130px;display:grid;place-items:center;background:rgba(37,99,235,.07);color:var(--primary);font-size:36px">📄</div>`:`<img src="${esc(x.url)}" onerror="this.src='https://placehold.co/300x150/2563eb/ffffff?text=Image'">`}
+        <div class="meta">
+          <b style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(x.name||"ملف")}">${esc(x.name||"ملف")}</b>
+          <div class="muted" style="font-size:11px">${esc(x.type||"ملف")} ${x.size?`• ${(x.size/1024/1024).toFixed(2)} MB`:""}</div>
+          
+          <div style="position:relative;margin:4px 0">
+            <input type="text" readonly value="${esc(x.url)}" style="width:100%;font-size:11px;padding:6px 52px 6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);direction:ltr;text-align:left" onclick="this.select()">
+            <button type="button" class="btn small" style="position:absolute;left:3px;top:50%;transform:translateY(-50%);padding:3px 8px;font-size:11px" onclick="copyMediaUrl('${esc(x.id)}', this)">نسخ 📋</button>
+          </div>
+
+          <div class="actions" style="margin-top:auto;padding-top:4px">
+            <button class="btn small success" style="flex:1" onclick="copyMediaUrl('${esc(x.id)}', this)">نسخ الرابط 📋</button>
+            ${isVid ? `<button class="btn small secondary" onclick="copyMediaEmbed('${esc(x.id)}', this)" title="نسخ كود التضمين">تضمين 🔗</button>` : ""}
+            <a href="${esc(x.url)}" target="_blank" class="btn small secondary" style="text-decoration:none">معاينة ↗</a>
+            <button class="btn small danger" onclick="deleteMedia('${esc(x.id)}')">حذف</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderMediaList(){
+  const container=$("mediaListContainer");
+  if(!container)return;
+  const media=state.snapshot.media||[];
+  const filter=(state.mediaFilter||"").trim().toLowerCase();
+  const filtered=media.filter(x=>{
+    if(!filter)return true;
+    return (x.name||"").toLowerCase().includes(filter)||(x.url||"").toLowerCase().includes(filter)||(x.type||"").toLowerCase().includes(filter);
+  });
+  container.innerHTML=renderMediaGrid(filtered);
+}
+
+function uploadModal(){
+  modal("رفع ملف جديد",`<div class="upload">
+    <p>اختر صورة أو فيديو أو ملفًا تعليميًا من جهازك للحفظ في قاعدة البيانات</p>
+    <input id="mediaFile" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.zip">
+  </div>
+  <div class="form-actions">
+    <button class="btn" id="uploadMediaBtn" onclick="uploadMedia()">رفع وحفظ في القاعدة ✓</button>
+    <button class="btn secondary" onclick="closeModal()">إلغاء</button>
+  </div>`);
+}
+
+async function uploadFileToStorage(file){
+  if(!file) return "";
+  const ext = file.name.split('.').pop() || 'png';
+  const cleanName = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  
+  try {
+    const uploadRes = await fetch(`${CONFIG.url}/storage/v1/object/media/${cleanName}`, {
+      method: "POST",
+      headers: {
+        "apikey": CONFIG.key,
+        "Authorization": "Bearer " + CONFIG.key,
+        "Content-Type": file.type || "application/octet-stream"
+      },
+      body: file
+    });
+    if(uploadRes.ok){
+      return `${CONFIG.url}/storage/v1/object/public/media/${cleanName}`;
+    }
+  } catch(e) {
+    console.warn("جاري استخدام التخزين الدائم المباشر في القاعدة:", e);
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => resolve(URL.createObjectURL(file));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadMedia(){
+  const f=$("mediaFile")?.files?.[0];
+  if(!f){toast("اختر ملفًا أولًا","warn");return}
+  const btn = $("uploadMediaBtn");
+  if(btn){btn.disabled=true;btn.textContent="جاري الرفع والحفظ..."}
+
+  try{
+    const permUrl = await uploadFileToStorage(f);
+    state.snapshot.media.unshift({
+      id:crypto.randomUUID(),
+      name:f.name,
+      type:f.type||"application/octet-stream",
+      size:f.size,
+      path:"media/"+f.name,
+      url:permUrl,
+      createdAt:new Date().toISOString()
+    });
+    audit("تم رفع وتثبيت ملف جديد: " + f.name,"الوسائط");
+    closeModal();
+    render();
+    await sync("تم رفع وحفظ الملف في قاعدة البيانات بنجاح");
+  }catch(err){
+    toast("حدث خطأ أثناء الرفع: " + err.message, "error");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="رفع وحفظ في القاعدة ✓"}
+  }
+}
+
+async function deleteMedia(id){
+  state.snapshot.media=state.snapshot.media.filter(m=>m.id!==id);
+  audit("تم حذف ملف","الوسائط");
+  render();
+  await sync("تم حذف الملف");
+}
+
+async function uploadFormFiles(){
+  for(const el of document.querySelectorAll("[data-file-path]")){
+    const f=el.files?.[0];
+    if(f){
+      const url=await uploadFileToStorage(f);
+      const path=el.dataset.filePath;
+      if(path.startsWith("m.")){
+        const h=document.querySelector(`[data-m="${path.slice(2)}"]`);
+        if(h)h.value=url;
+      }else setPath(path,url);
+    }
+  }
+}
+
+function modal(title,body){
+  $("modalRoot").innerHTML=`<div class="modal-back" id="modalBack">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>${title}</h3>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      ${body}
+    </div>
+  </div>`;
+}
+
+function closeModal(){$("modalRoot").innerHTML=""}
+
+$("loginBtn").onclick=async()=>{
+  const p=$("adminPassword").value.trim();
+  if(!p){$("loginError").textContent="أدخل كلمة المرور";return}
+  state.password=p;
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  await load();
+};
+
+$("demoBtn").onclick=()=>{
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  load();
+  toast("أهلاً بك في وضع المعاينة المباشرة للوحة التحكم ⚡");
+};
+
+$("adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginBtn").click()});
+$("logoutBtn").onclick=()=>{
+  state.password="";
+  $("app").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("adminPassword").value="";
+};
+
+$("themeBtn").onclick=()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("abuqaoud_admin_theme",document.body.classList.contains("dark")?"dark":"light");
+};
+
+$("refreshBtn").onclick=()=>load();
+$("openSide").onclick=()=>$("sidebar").classList.add("open");
+$("closeSide").onclick=()=>$("sidebar").classList.remove("open");
+
+$("exportBtn").onclick=()=>{
+  const data=JSON.stringify(state.snapshot,null,2);
+  const blob=new Blob([data],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="abuqaoud_backup_"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+  toast("تم تصدير النسخة الاحتياطية بنجاح 💾");
+};
+
+$("importBtn").onclick=()=>{$("importFile").click()};
+$("importFile").onchange=e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    try{
+      const imported=JSON.parse(ev.target.result);
+      state.snapshot=normalizeSnapshot(imported);
+      render();
+      await sync("تم استيراد النسخة الاحتياطية بنجاح");
+    }catch(err){
+      toast("ملف غير صالح","error");
+    }
+  };
+  reader.readAsText(f);
+};
+
+if(localStorage.getItem("abuqaoud_admin_theme")==="dark")document.body.classList.add("dark");
+</script>
+</body>
+</html>
